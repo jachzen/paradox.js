@@ -46,7 +46,7 @@ function classify(number) {
 
 function unsetBit(buffer) {
     var b = buffer
-    var firstByte = b[0] - 2 ** (4 * 2 - 1)
+    var firstByte = b[0] & 0x7f;
 
     if (b.length === 1) {
         if (buffer.readUInt8() !== 0) {
@@ -338,7 +338,7 @@ class ParadoxTable {
                     record[this.TFldInfoRecArray[k].name] = new Field(this.TFldInfoRecArray[k].name,
                         this.TFldInfoRecArray[k].getType(),
                         this.buffer.slice(recordsStart,
-                            recordsStart + this.TFldInfoRecArray[k].getSize()), "ascii", disableWarning)
+                            recordsStart + this.TFldInfoRecArray[k].getSize()), "latin1", disableWarning)
                     
                     recordsStart += this.TFldInfoRecArray[k].getSize()
 
@@ -391,7 +391,7 @@ class ParadoxTable {
                     record.push(new Field(this.TFldInfoRecArray[k].name,
                         this.TFldInfoRecArray[k].getType(),
                         this.buffer.slice(recordsStart,
-                            recordsStart + this.TFldInfoRecArray[k].getSize()), "ascii", disableWarning, dateOffset
+                            recordsStart + this.TFldInfoRecArray[k].getSize()), "latin1", disableWarning, dateOffset
                     )
                     )
                     recordsStart += this.TFldInfoRecArray[k].getSize()
@@ -492,6 +492,8 @@ class Field {
         switch (this.type) {
             case 1:
                 //        |      |            $01     v   "A"  Alpha                                   |
+                const i = value.indexOf(0x00);
+                value = value.slice(0, i);
                 this.value = value.toString(encoding)
                 break
             case 2:
