@@ -492,6 +492,8 @@ class Field {
         switch (this.type) {
             case 1:
                 //        |      |            $01     v   "A"  Alpha                                   |
+                // add 0x00 to indicate end of string
+                value = Buffer.concat([value, new Buffer(1)]);
                 const i = value.indexOf(0x00);
                 value = value.slice(0, i);
                 this.value = value.toString(encoding)
